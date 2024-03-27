@@ -1,17 +1,19 @@
-const express = require("express");
-const { faker } = require("@faker-js/faker");
+import express from 'express';
+import { faker } from '@faker-js/faker';
+import healthCheck from '@nymdev/health-check';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+app.use(healthCheck());
 
 // Mock authentication middleware
 function authenticate(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  if (!authHeader || authHeader !== "Bearer MOCK_API_KEY") {
-    return res.status(401).json({ error: "Unauthorized" });
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || authHeader !== 'Bearer MOCK_API_KEY') {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
   next();
 }
@@ -28,34 +30,34 @@ function generateWeatherData(city) {
     temperature: faker.number.int({ min: -20, max: 40 }),
     humidity: faker.number.int({ min: 0, max: 100 }),
     condition: faker.helpers.arrayElement([
-      "Sunny",
-      "Cloudy",
-      "Rainy",
-      "Snowy",
+      'Sunny',
+      'Cloudy',
+      'Rainy',
+      'Snowy',
     ]),
   };
 }
 
 // Home endpoint
-app.get("/", (req, res) => {
-  res.send("Welcome to the Weather API");
+app.get('/', (req, res) => {
+  res.send('Welcome to the Weather API');
 });
 // Endpoint to get weather information for a given city
-app.get("/weather", (req, res) => {
-  const city = req.query.city || "NewYork"; // Default city is NewYork if not specified
+app.get('/weather', (req, res) => {
+  const city = req.query.city || 'NewYork'; // Default city is NewYork if not specified
   const weatherData = generateWeatherData(city);
   res.json(weatherData);
 });
 
 // Endpoint to get weather information for a given city
-app.get("/auth-required-weather", authenticate, (req, res) => {
-  const city = req.query.city || "NewYork"; // Default city is NewYork if not specified
+app.get('/auth-required-weather', authenticate, (req, res) => {
+  const city = req.query.city || 'NewYork'; // Default city is NewYork if not specified
   const weatherData = generateWeatherData(city);
   res.json(weatherData);
 });
 
 // Endpoint to convert Celsius temperature to Fahrenheit
-app.post("/convert-celsius-to-fahrenheit", (req, res) => {
+app.post('/convert-celsius-to-fahrenheit', (req, res) => {
   const { temperature } = req.body;
   // Convert Celsius temperature to Fahrenheit
   const temperatureFahrenheit = convertCelsiusToFahrenheit(temperature);
@@ -63,25 +65,25 @@ app.post("/convert-celsius-to-fahrenheit", (req, res) => {
   res.json({ temperatureFahrenheit });
 });
 
-app.post("/signup", (req, res) => {
+app.post('/signup', (req, res) => {
   const { email, password } = req.body;
   // For demonstration purposes, echo back the received data
   console.log(email, password);
   res.json({
-    message: "Signup successful",
+    message: 'Signup successful',
     email,
     password,
   });
 });
 
 // Sample endpoint to receive POST requests
-app.post("/data", (req, res) => {
+app.post('/data', (req, res) => {
   console.log(req.body);
-  res.status(201).json({ message: "Data received successfully" });
+  res.status(201).json({ message: 'Data received successfully' });
 });
 
 // Endpoint to get the current time
-app.get("/time", (req, res) => {
+app.get('/time', (req, res) => {
   const currentTime = new Date().toLocaleTimeString();
   res.json({ currentTime });
 });
